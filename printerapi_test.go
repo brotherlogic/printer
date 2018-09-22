@@ -1,69 +1,24 @@
 package main
 
-import "fmt"
-import pbrc "github.com/brotherlogic/recordcollection/proto"
-import pbgd "github.com/brotherlogic/godiscogs"
+import (
+	"context"
+	"testing"
 
-type testGh struct {
-	count int
-	fail  bool
+	"github.com/brotherlogic/keystore/client"
+
+	pb "github.com/brotherlogic/printer/proto"
+)
+
+func InitTestServer() *Server {
+	s := Init()
+	s.SkipLog = true
+	s.print = false
+	s.GoServer.KSclient = *keystoreclient.GetTestClient(".test")
+
+	return s
 }
 
-func (gh *testGh) alert(r *pbrc.Record, text string) error {
-	if gh.fail {
-		return fmt.Errorf("Built to fail")
-	}
-	gh.count++
-	return nil
-}
-
-type testRc struct {
-	fail    bool
-	order   bool
-	missing bool
-}
-
-func (rc *testRc) getRecordsInPurgatory() ([]*pbrc.Record, error) {
-	if rc.fail {
-		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
-	}
-	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}, Metadata: &pbrc.ReleaseMetadata{}}}, nil
-}
-
-func (rc *testRc) getSaleRecords() ([]*pbrc.Record, error) {
-	if rc.fail {
-		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
-	}
-	return []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Title: "MadeUp"}, Metadata: &pbrc.ReleaseMetadata{}}}, nil
-}
-
-func (rc *testRc) getLibraryRecords() ([]*pbrc.Record, error) {
-	if rc.fail {
-		return []*pbrc.Record{}, fmt.Errorf("Built to fail")
-	}
-
-	if !rc.order {
-		return []*pbrc.Record{
-			&pbrc.Record{Release: &pbgd.Release{Title: "Jazz Moderne"}},
-			&pbrc.Record{Release: &pbgd.Release{Title: "Action Charme Espace"}},
-			&pbrc.Record{Release: &pbgd.Release{Title: "Paysages, Evasion, Melancolie"}},
-			&pbrc.Record{Release: &pbgd.Release{Title: "Sports Et Action"}},
-		}, nil
-	}
-
-	if rc.missing {
-		return []*pbrc.Record{
-			&pbrc.Record{Release: &pbgd.Release{Title: "Jazz Moderne"}},
-			&pbrc.Record{Release: &pbgd.Release{Title: "Paysages, Evasion, Melancolie"}},
-			&pbrc.Record{Release: &pbgd.Release{Title: "Sports Et Action"}},
-		}, nil
-	}
-
-	return []*pbrc.Record{
-		&pbrc.Record{Release: &pbgd.Release{Title: "Action Charme Espace"}},
-		&pbrc.Record{Release: &pbgd.Release{Title: "Paysages, Evasion, Melancolie"}},
-		&pbrc.Record{Release: &pbgd.Release{Title: "Jazz Moderne"}},
-		&pbrc.Record{Release: &pbgd.Release{Title: "Sports Et Action"}},
-	}, nil
-
+func TestPrint(t *testing.T) {
+	server := InitTestServer()
+	server.Print(context.Background(), &pb.PrintRequest{Text: "hello"})
 }
