@@ -5,30 +5,41 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os/exec"
 
 	"github.com/brotherlogic/goserver"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	pbg "github.com/brotherlogic/goserver/proto"
+	pb "github.com/brotherlogic/printer/proto"
 )
 
 //Server main server type
 type Server struct {
 	*goserver.GoServer
+	print bool
+}
+
+func (s *Server) localPrint(text string) error {
+	if s.print {
+		return exec.Command("python", "print.py", text).Run()
+	}
+	return nil
 }
 
 // Init builds the server
 func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
+		true,
 	}
 	return s
 }
 
 // DoRegister does RPC registration
 func (s *Server) DoRegister(server *grpc.Server) {
-	// Do nothing
+	pb.RegisterPrintServiceServer(server, s)
 }
 
 // ReportHealth alerts if we're not healthy

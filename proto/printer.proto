@@ -1,3 +1,13 @@
 syntax = "proto3";
 
 package printer;
+
+message PrintRequest {
+  string text = 1;
+}
+
+message PrintResponse {}
+
+service PrintService {
+  rpc Print(PrintRequest) returns (PrintResponse) {};
+}
