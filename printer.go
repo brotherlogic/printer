@@ -24,7 +24,7 @@ type Server struct {
 
 func (s *Server) localPrint(text string) error {
 	if s.print {
-		cmd := exec.Command("python", "print.py", text)
+		cmd := exec.Command("sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py", text)
 
 		output := ""
 		out, err := cmd.StderrPipe()
