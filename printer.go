@@ -27,7 +27,7 @@ func (s *Server) localPrint(text string) error {
 		cmd := exec.Command("python", "print.py", text)
 
 		output := ""
-		out, err := cmd.StdoutPipe()
+		out, err := cmd.StderrPipe()
 
 		if err != nil {
 			s.Log(fmt.Sprintf("Error stdout: %v", err))
