@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -23,7 +24,25 @@ type Server struct {
 
 func (s *Server) localPrint(text string) error {
 	if s.print {
-		return exec.Command("python", "print.py", text).Run()
+		cmd := exec.Command("python", "print.py", text)
+
+		output := ""
+		out, _ := cmd.StdoutPipe()
+		if out != nil {
+			scanner := bufio.NewScanner(out)
+			go func() {
+				for scanner != nil && scanner.Scan() {
+					output += scanner.Text()
+				}
+				out.Close()
+			}()
+		}
+
+		cmd.Start()
+		err := cmd.Wait()
+
+		s.Log(fmt.Sprintf("OUTPUT = %v", output))
+		return err
 	}
 	return nil
 }
