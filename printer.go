@@ -44,7 +44,7 @@ func (s *Server) localPrint(text string) error {
 		}
 
 		cmd.Start()
-		err := cmd.Wait()
+		err = cmd.Wait()
 
 		s.Log(fmt.Sprintf("OUTPUT = %v", output))
 		return err
