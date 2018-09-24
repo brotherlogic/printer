@@ -27,7 +27,12 @@ func (s *Server) localPrint(text string) error {
 		cmd := exec.Command("python", "print.py", text)
 
 		output := ""
-		out, _ := cmd.StdoutPipe()
+		out, err := cmd.StdoutPipe()
+
+		if err != nil {
+			s.Log(fmt.Sprintf("Error stdout: %v", err))
+		}
+
 		if out != nil {
 			scanner := bufio.NewScanner(out)
 			go func() {
