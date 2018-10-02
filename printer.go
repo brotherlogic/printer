@@ -20,9 +20,11 @@ import (
 type Server struct {
 	*goserver.GoServer
 	print bool
+	count int
 }
 
 func (s *Server) localPrint(text string) error {
+	s.count++
 	if s.print {
 		cmd := exec.Command("sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py", text)
 
@@ -56,7 +58,8 @@ func (s *Server) localPrint(text string) error {
 func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
-		true,
+		false,
+		0,
 	}
 	return s
 }
@@ -78,7 +81,9 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
-	return []*pbg.State{}
+	return []*pbg.State{
+		&pbg.State{Key: "count", Value: int64(s.count)},
+	}
 }
 
 func main() {
