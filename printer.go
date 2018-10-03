@@ -30,7 +30,7 @@ func (s *Server) localPrint(text string, lines []string) error {
 		if len(text) == 0 {
 			all := []string{"sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py"}
 			all = append(all, lines...)
-			exec.Command("sudo", all...)
+			cmd = exec.Command("sudo", all...)
 		}
 
 		output := ""
