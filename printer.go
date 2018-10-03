@@ -58,7 +58,7 @@ func (s *Server) localPrint(text string) error {
 func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
-		false,
+		true,
 		0,
 	}
 	return s
