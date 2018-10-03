@@ -23,10 +23,15 @@ type Server struct {
 	count int
 }
 
-func (s *Server) localPrint(text string) error {
+func (s *Server) localPrint(text string, lines []string) error {
 	s.count++
 	if s.print {
 		cmd := exec.Command("sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py", text)
+		if len(text) == 0 {
+			all := []string{"sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py"}
+			all = append(all, lines...)
+			exec.Command("sudo", all...)
+		}
 
 		output := ""
 		out, err := cmd.StderrPipe()
