@@ -4,6 +4,7 @@ package printer;
 
 message PrintRequest {
   string text = 1;
+  repeated string lines = 2;
 }
 
 message PrintResponse {}
