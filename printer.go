@@ -83,6 +83,7 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 func (s *Server) GetState() []*pbg.State {
 	return []*pbg.State{
 		&pbg.State{Key: "count", Value: int64(s.count)},
+		&pbg.State{Key: "enabled", Text: fmt.Sprintf("%v", s.print)},
 	}
 }
 
