@@ -27,7 +27,7 @@ func main() {
 	defer conn.Close()
 
 	client := pbp.NewPrintServiceClient(conn)
-	r, err := client.Print(context.Background(), &pbp.PrintRequest{Text: os.Args[1]})
+	r, err := client.Print(context.Background(), &pbp.PrintRequest{Lines: os.Args})
 	fmt.Printf("%v and %v\n", r, err)
 
 	utils.SendTrace(ctx, "PrintCLI", time.Now(), pbt.Milestone_END, "printer")
