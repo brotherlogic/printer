@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os/exec"
+	"time"
 
 	"github.com/brotherlogic/goserver"
 	"golang.org/x/net/context"
@@ -23,7 +24,11 @@ type Server struct {
 	count int
 }
 
-func (s *Server) localPrint(text string, lines []string) error {
+func (s *Server) localPrint(text string, lines []string, ti time.Time) error {
+	if ti.Hour() < 9 || ti.Hour() > 16 {
+		return fmt.Errorf("Not the time to print right now")
+	}
+
 	s.count++
 	if s.print {
 		cmd := exec.Command("sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py", text)
@@ -34,7 +39,7 @@ func (s *Server) localPrint(text string, lines []string) error {
 		}
 
 		output := ""
-		out, err := cmd.StderrPipe()
+		out, err := cmd.StdoutPipe()
 
 		if err != nil {
 			s.Log(fmt.Sprintf("Error stdout: %v", err))
