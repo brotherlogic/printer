@@ -68,7 +68,7 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) error {
 func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
-		false,
+		true, //Print enabled
 		0,
 	}
 	return s
