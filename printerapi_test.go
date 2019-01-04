@@ -11,8 +11,9 @@ import (
 
 func InitTestServer() *Server {
 	s := Init()
+	s.pretend = true
 	s.SkipLog = true
-	s.print = false
+	s.whitelist = []string{"inwhitelist"}
 	s.GoServer.KSclient = *keystoreclient.GetTestClient(".test")
 
 	return s
@@ -20,5 +21,18 @@ func InitTestServer() *Server {
 
 func TestPrint(t *testing.T) {
 	server := InitTestServer()
-	server.Print(context.Background(), &pb.PrintRequest{Text: "hello"})
+	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
+
+	if server.prints != 1 {
+		t.Errorf("Unable to print")
+	}
+}
+
+func TestPrintFail(t *testing.T) {
+	server := InitTestServer()
+	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "notinwhitelist"})
+
+	if server.prints > 0 {
+		t.Errorf("Unwhitelisted origin was printed")
+	}
 }
