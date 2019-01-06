@@ -72,6 +72,7 @@ func Init() *Server {
 		&goserver.GoServer{},
 		[]string{
 			"beerserver",
+			"recordprinter",
 		},
 		int64(0),
 		false, // Prod version actually prints
