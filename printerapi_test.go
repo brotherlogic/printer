@@ -23,6 +23,8 @@ func TestPrint(t *testing.T) {
 	server := InitTestServer()
 	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
 
+	server.processPrints(context.Background())
+
 	if server.prints != 1 {
 		t.Errorf("Unable to print")
 	}
