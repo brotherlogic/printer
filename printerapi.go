@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	pb "github.com/brotherlogic/printer/proto"
 	"golang.org/x/net/context"
@@ -21,6 +20,7 @@ func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResp
 		return &pb.PrintResponse{}, fmt.Errorf("Origin is not in the whitelist")
 	}
 
-	err := s.localPrint(req.Text, req.Lines, time.Now())
-	return &pb.PrintResponse{}, err
+	s.config.Requests = append(s.config.Requests, req)
+	s.save(ctx)
+	return &pb.PrintResponse{}, nil
 }

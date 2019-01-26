@@ -146,6 +146,8 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 	server.RegisterServer("printer", false)
-	server.Log("Starting!")
+
+	server.RegisterRepeatingTask(server.processPrints, "process_prints", time.Minute)
+
 	fmt.Printf("%v", server.Serve())
 }
