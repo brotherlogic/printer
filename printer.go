@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/brotherlogic/goserver"
+	"github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -17,12 +18,34 @@ import (
 	pb "github.com/brotherlogic/printer/proto"
 )
 
+const (
+	// KEY - where the wants are stored
+	KEY = "/github.com/brotherlogic/printer/config"
+)
+
+func (s *Server) load(ctx context.Context) error {
+	config := &pb.Config{}
+	data, _, err := s.KSclient.Read(ctx, KEY, config)
+
+	if err != nil {
+		return err
+	}
+
+	s.config = data.(*pb.Config)
+	return nil
+}
+
+func (s *Server) save(ctx context.Context) {
+	s.KSclient.Save(ctx, KEY, s.config)
+}
+
 //Server main server type
 type Server struct {
 	*goserver.GoServer
 	whitelist []string
 	prints    int64
 	pretend   bool // Used for testing only
+	config    *pb.Config
 }
 
 func (s *Server) localPrint(text string, lines []string, ti time.Time) error {
@@ -76,7 +99,9 @@ func Init() *Server {
 		},
 		int64(0),
 		false, // Prod version actually prints
+		&pb.Config{},
 	}
+	s.GoServer.KSclient = *keystoreclient.GetClient(s.GetIP)
 	return s
 }
 
@@ -92,6 +117,10 @@ func (s *Server) ReportHealth() bool {
 
 // Mote promotes/demotes this server
 func (s *Server) Mote(ctx context.Context, master bool) error {
+	if master {
+		return s.load(ctx)
+	}
+
 	return nil
 }
 
@@ -100,6 +129,7 @@ func (s *Server) GetState() []*pbg.State {
 	return []*pbg.State{
 		&pbg.State{Key: "prints", Value: s.prints},
 		&pbg.State{Key: "whitelisted", Value: int64(len(s.whitelist))},
+		&pbg.State{Key: "backlog", Value: int64(len(s.config.Requests))},
 	}
 }
 
