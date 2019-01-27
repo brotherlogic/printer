@@ -13,5 +13,7 @@ func (s *Server) processPrints(ctx context.Context) {
 		if err == nil {
 			s.config.Requests = s.config.Requests[1:]
 		}
+
+		s.save(ctx)
 	}
 }
