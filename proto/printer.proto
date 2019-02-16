@@ -14,6 +14,11 @@ message PrintRequest {
 
 message PrintResponse {}
 
+message ClearRequest {}
+
+message ClearResponse {}
+
 service PrintService {
   rpc Print(PrintRequest) returns (PrintResponse) {};
+  rpc Clear(ClearRequest) returns (ClearResponse) {};
 }

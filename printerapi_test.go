@@ -30,6 +30,23 @@ func TestPrint(t *testing.T) {
 	}
 }
 
+func TestClear(t *testing.T) {
+	server := InitTestServer()
+	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
+	server.Clear(context.Background(), &pb.ClearRequest{})
+
+	if server.prints != 0 {
+		t.Errorf("We've recorded %v prints, despite not processing")
+	}
+
+	server.Print(context.Background(), &pb.PrintRequest{Text: "hello there", Origin: "inwhitelist"})
+	server.processPrints(context.Background())
+
+	if server.prints != 1 {
+		t.Errorf("Wrong number of prints recorded: %v", server.prints)
+	}
+}
+
 func TestPrintFail(t *testing.T) {
 	server := InitTestServer()
 	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "notinwhitelist"})

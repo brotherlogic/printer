@@ -24,3 +24,10 @@ func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResp
 	s.save(ctx)
 	return &pb.PrintResponse{}, nil
 }
+
+// Clear clears all the backlog
+func (s *Server) Clear(ctx context.Context, req *pb.ClearRequest) (*pb.ClearResponse, error) {
+	s.config.Requests = nil
+	s.save(ctx)
+	return &pb.ClearResponse{}, nil
+}

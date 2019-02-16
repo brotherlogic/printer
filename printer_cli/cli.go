@@ -27,8 +27,14 @@ func main() {
 	defer conn.Close()
 
 	client := pbp.NewPrintServiceClient(conn)
-	r, err := client.Print(context.Background(), &pbp.PrintRequest{Lines: os.Args})
-	fmt.Printf("%v and %v -> %v\n", r, err, &pbp.PrintRequest{Lines: os.Args})
 
-	utils.SendTrace(ctx, "PrintCLI", time.Now(), pbt.Milestone_END, "printer")
+	if os.Args[1] == "clear" {
+		client.Clear(context.Background(), &pbp.ClearRequest{})
+	} else {
+
+		r, err := client.Print(context.Background(), &pbp.PrintRequest{Lines: os.Args})
+		fmt.Printf("%v and %v -> %v\n", r, err, &pbp.PrintRequest{Lines: os.Args})
+
+		utils.SendTrace(ctx, "PrintCLI", time.Now(), pbt.Milestone_END, "printer")
+	}
 }
