@@ -1,25 +1,21 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/brotherlogic/goserver/utils"
 	"google.golang.org/grpc"
 
-	pbgs "github.com/brotherlogic/goserver/proto"
 	pbp "github.com/brotherlogic/printer/proto"
-	pbt "github.com/brotherlogic/tracer/proto"
 
 	//Needed to pull in gzip encoding init
 	_ "google.golang.org/grpc/encoding/gzip"
 )
 
 func main() {
-	ctx, cancel := utils.BuildContext("PrintCLI", "printer", pbgs.ContextType_MEDIUM)
+	ctx, cancel := utils.BuildContext("PrintCLI", "printer")
 	defer cancel()
 
 	host, port, _ := utils.Resolve("printer")
@@ -29,12 +25,11 @@ func main() {
 	client := pbp.NewPrintServiceClient(conn)
 
 	if os.Args[1] == "clear" {
-		client.Clear(context.Background(), &pbp.ClearRequest{})
+		client.Clear(ctx, &pbp.ClearRequest{})
 	} else {
 
-		r, err := client.Print(context.Background(), &pbp.PrintRequest{Lines: os.Args})
+		r, err := client.Print(ctx, &pbp.PrintRequest{Lines: os.Args})
 		fmt.Printf("%v and %v -> %v\n", r, err, &pbp.PrintRequest{Lines: os.Args})
 
-		utils.SendTrace(ctx, "PrintCLI", time.Now(), pbt.Milestone_END, "printer")
 	}
 }

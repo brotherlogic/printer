@@ -9,6 +9,7 @@ import (
 
 // Print performs a print
 func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResponse, error) {
+	s.Log(fmt.Sprintf("RECEIVED PRINT REQUEST"))
 	found := false
 	for _, whitelisted := range s.whitelist {
 		if req.Origin == whitelisted {
