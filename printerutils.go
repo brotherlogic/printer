@@ -6,7 +6,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *Server) processPrints(ctx context.Context) {
+func (s *Server) processPrints(ctx context.Context) error {
 	if len(s.config.Requests) > 0 {
 		req := s.config.Requests[0]
 		err := s.localPrint(req.Text, req.Lines, time.Now())
@@ -16,4 +16,6 @@ func (s *Server) processPrints(ctx context.Context) {
 
 		s.save(ctx)
 	}
+
+	return nil
 }
