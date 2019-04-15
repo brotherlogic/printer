@@ -98,7 +98,7 @@ func Init() *Server {
 			"recordprinter",
 		},
 		int64(0),
-		true, // Prod version actually prints
+		false, // Prod version doesn't pretend to print
 		&pb.Config{},
 	}
 	s.GoServer.KSclient = *keystoreclient.GetClient(s.GetIP)
