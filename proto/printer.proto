@@ -4,6 +4,7 @@ package printer;
 
 message Config {
   repeated PrintRequest requests = 1;
+  int64 total_prints = 2;
 }
 
 message PrintRequest {
