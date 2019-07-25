@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc"
 
 	pbg "github.com/brotherlogic/goserver/proto"
+	"github.com/brotherlogic/goserver/utils"
 	pb "github.com/brotherlogic/printer/proto"
 )
 
@@ -58,6 +59,7 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) error {
 	}
 
 	s.prints++
+	s.config.TotalPrints++
 	cmd := exec.Command("sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py", text)
 	if len(text) == 0 {
 		all := []string{"sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py"}
@@ -101,7 +103,7 @@ func Init() *Server {
 		false, // Prod version doesn't pretend to print
 		&pb.Config{},
 	}
-	s.GoServer.KSclient = *keystoreclient.GetClient(s.GetIP)
+	s.GoServer.KSclient = *keystoreclient.GetClient(s.DialMaster)
 	return s
 }
 
@@ -141,6 +143,7 @@ func (s *Server) GetState() []*pbg.State {
 
 func main() {
 	var quiet = flag.Bool("quiet", false, "Show all output")
+	var init = flag.Bool("init", false, "Init the config")
 	flag.Parse()
 
 	//Turn off logging
@@ -152,6 +155,14 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 	server.RegisterServer("printer", false)
+
+	if *init {
+		ctx, cancel := utils.BuildContext("printer", "printer")
+		defer cancel()
+		server.config.TotalPrints = 1
+		server.save(ctx)
+		return
+	}
 
 	server.RegisterRepeatingTask(server.processPrints, "process_prints", time.Minute)
 
