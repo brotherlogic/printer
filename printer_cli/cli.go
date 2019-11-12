@@ -18,7 +18,7 @@ func main() {
 	ctx, cancel := utils.BuildContext("PrintCLI", "printer")
 	defer cancel()
 
-	host, port, _ := utils.Resolve("printer")
+	host, port, _ := utils.Resolve("printer", "printer-cli")
 	conn, _ := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
 
@@ -28,7 +28,7 @@ func main() {
 		client.Clear(ctx, &pbp.ClearRequest{})
 	} else {
 
-		r, err := client.Print(ctx, &pbp.PrintRequest{Lines: os.Args})
+		r, err := client.Print(ctx, &pbp.PrintRequest{Lines: os.Args, Origin: "recordprinter"})
 		fmt.Printf("%v and %v -> %v\n", r, err, &pbp.PrintRequest{Lines: os.Args})
 
 	}
