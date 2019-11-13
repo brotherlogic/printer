@@ -54,6 +54,8 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) error {
 		s.prints++
 		return nil
 	}
+
+	s.Log(fmt.Sprintf("Assessing print at %v", ti))
 	if ti.Hour() < 9 || ti.Hour() > 17 || ti.Weekday() == time.Saturday || ti.Weekday() == time.Sunday {
 		return fmt.Errorf("Not the time to print right now")
 	}
