@@ -156,7 +156,7 @@ func main() {
 	server := Init()
 	server.PrepServer()
 	server.Register = server
-	server.RegisterServer("printer", false)
+	server.RegisterServerV2("printer", false, false)
 
 	if *init {
 		ctx, cancel := utils.BuildContext("printer", "printer")
