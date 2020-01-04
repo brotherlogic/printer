@@ -43,16 +43,17 @@ func (s *Server) save(ctx context.Context) {
 //Server main server type
 type Server struct {
 	*goserver.GoServer
-	whitelist []string
-	prints    int64
-	pretend   bool // Used for testing only
-	config    *pb.Config
+	whitelist  []string
+	prints     int64
+	pretend    bool // Used for testing only
+	pretendret error
+	config     *pb.Config
 }
 
 func (s *Server) localPrint(text string, lines []string, ti time.Time) error {
 	if s.pretend {
 		s.prints++
-		return nil
+		return s.pretendret
 	}
 
 	s.Log(fmt.Sprintf("Assessing print at %v", ti))
@@ -103,6 +104,7 @@ func Init() *Server {
 		},
 		int64(0),
 		false, // Prod version doesn't pretend to print
+		nil,
 		&pb.Config{},
 	}
 	s.GoServer.KSclient = *keystoreclient.GetClient(s.DialMaster)
