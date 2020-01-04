@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/brotherlogic/keystore/client"
@@ -30,13 +31,25 @@ func TestPrint(t *testing.T) {
 	}
 }
 
+func TestPrintFailOnLoop(t *testing.T) {
+	server := InitTestServer()
+	server.pretendret = fmt.Errorf("Built to fail")
+	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
+
+	err := server.processPrints(context.Background())
+
+	if err == nil {
+		t.Errorf("Did not fail")
+	}
+}
+
 func TestClear(t *testing.T) {
 	server := InitTestServer()
 	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
 	server.Clear(context.Background(), &pb.ClearRequest{})
 
 	if server.prints != 0 {
-		t.Errorf("We've recorded %v prints, despite not processing")
+		t.Errorf("We've recorded %v prints, despite not processing", server.prints)
 	}
 
 	server.Print(context.Background(), &pb.PrintRequest{Text: "hello there", Origin: "inwhitelist"})
