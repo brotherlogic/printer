@@ -13,6 +13,8 @@ import (
 	"github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	pbg "github.com/brotherlogic/goserver/proto"
 	"github.com/brotherlogic/goserver/utils"
@@ -58,7 +60,7 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) error {
 
 	s.Log(fmt.Sprintf("Assessing print at %v", ti))
 	if ti.Hour() < 9 || ti.Hour() > 17 || ti.Weekday() == time.Saturday || ti.Weekday() == time.Sunday {
-		return fmt.Errorf("Not the time to print right now")
+		return status.Errorf(codes.Unavailable, "Not the time to print right now")
 	}
 
 	s.prints++
