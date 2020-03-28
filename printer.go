@@ -59,7 +59,7 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) error {
 	}
 
 	s.Log(fmt.Sprintf("Assessing print at %v", ti))
-	if ti.Hour() < 9 || ti.Hour() > 17 || ti.Weekday() == time.Saturday || ti.Weekday() == time.Sunday {
+	if ti.Hour() < 9 || ti.Hour() > 17 || ((ti.Weekday() == time.Saturday || ti.Weekday() == time.Sunday) && (ti.Hour() != 10)) {
 		return status.Errorf(codes.Unavailable, "Not the time to print right now")
 	}
 
