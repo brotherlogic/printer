@@ -16,6 +16,7 @@ func (s *Server) processPrints(ctx context.Context) error {
 		}
 
 		s.config.Requests = s.config.Requests[1:]
+		Backlog.Set(float64(len(s.config.Requests)))
 		s.save(ctx)
 	}
 
