@@ -22,6 +22,7 @@ func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResp
 	}
 
 	s.config.Requests = append(s.config.Requests, req)
+	Backlog.Set(float64(len(s.config.Requests)))
 	s.save(ctx)
 	return &pb.PrintResponse{}, nil
 }

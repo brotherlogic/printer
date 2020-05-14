@@ -11,6 +11,8 @@ import (
 
 	"github.com/brotherlogic/goserver"
 	"github.com/brotherlogic/keystore/client"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -24,6 +26,14 @@ import (
 const (
 	// KEY - where the wants are stored
 	KEY = "/github.com/brotherlogic/printer/config"
+)
+
+var (
+	//Backlog - the print queue
+	Backlog = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "printer_backlog",
+		Help: "The size of the print queue",
+	})
 )
 
 func (s *Server) load(ctx context.Context) error {
