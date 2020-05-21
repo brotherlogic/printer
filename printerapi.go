@@ -33,3 +33,8 @@ func (s *Server) Clear(ctx context.Context, req *pb.ClearRequest) (*pb.ClearResp
 	s.save(ctx)
 	return &pb.ClearResponse{}, nil
 }
+
+//List lists the backlog
+func (s *Server) List(ctx context.Context, req *pb.ListRequest) (*pb.ListResponse, error) {
+	return &pb.ListResponse{Queue: s.config.Requests}, nil
+}

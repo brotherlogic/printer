@@ -24,6 +24,14 @@ func TestPrint(t *testing.T) {
 	server := InitTestServer()
 	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
 
+	list, err := server.List(context.Background(), &pb.ListRequest{})
+	if err != nil {
+		t.Fatalf("Bad call: %v", err)
+	}
+	if len(list.GetQueue()) != 1 {
+		t.Errorf("Bad queue: %v", list)
+	}
+
 	server.processPrints(context.Background())
 
 	if server.prints != 1 {
