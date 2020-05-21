@@ -19,7 +19,14 @@ message ClearRequest {}
 
 message ClearResponse {}
 
+message ListRequest {}
+
+message ListResponse {
+  repeated PrintRequest queue = 1;
+}
+
 service PrintService {
   rpc Print(PrintRequest) returns (PrintResponse) {};
   rpc Clear(ClearRequest) returns (ClearResponse) {};
+  rpc List(ListRequest) returns (ListResponse) {};
 }
