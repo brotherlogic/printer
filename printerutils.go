@@ -3,22 +3,51 @@ package main
 import (
 	"time"
 
+	"github.com/brotherlogic/goserver/utils"
 	"golang.org/x/net/context"
+
+	pb "github.com/brotherlogic/printer/proto"
 )
 
-func (s *Server) processPrints(ctx context.Context) error {
-	if len(s.config.Requests) > 0 {
-		req := s.config.Requests[0]
-		err := s.localPrint(req.Text, req.Lines, time.Now())
+func (s *Server) printQueue() {
+	for val := range s.printq {
+
+		ctx, cancel := utils.ManualContext("printqueue", "printqueue", time.Minute, true)
+		t, err := s.processPrint(ctx, val)
+		cancel()
 
 		if err != nil {
-			return err
+			s.printq <- val
 		}
 
-		s.config.Requests = s.config.Requests[1:]
-		Backlog.Set(float64(len(s.config.Requests)))
-		s.save(ctx)
+		time.Sleep(t)
 	}
 
-	return nil
+	s.done <- true
+}
+
+func (s *Server) dequeue(ctx context.Context, reqrem *pb.PrintRequest) error {
+	config, err := s.load(ctx)
+	if err != nil {
+		return err
+	}
+	newList := []*pb.PrintRequest{}
+	for _, req := range config.GetRequests() {
+		if req.GetId() != reqrem.GetId() {
+			newList = append(newList, req)
+		}
+	}
+	config.Requests = newList
+	Backlog.Set(float64(len(config.Requests)))
+	return s.save(ctx, config)
+}
+
+func (s *Server) processPrint(ctx context.Context, req *pb.PrintRequest) (time.Duration, error) {
+	t, err := s.localPrint(req.Text, req.Lines, time.Now())
+
+	if err != nil {
+		return t, err
+	}
+
+	return t, s.dequeue(ctx, req)
 }

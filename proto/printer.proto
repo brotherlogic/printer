@@ -11,6 +11,7 @@ message PrintRequest {
   string text = 1;
   repeated string lines = 2;
   string origin = 3;
+  int64 id = 4;
 }
 
 message PrintResponse {}
