@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/brotherlogic/keystore/client"
 
@@ -14,8 +15,8 @@ func InitTestServer() *Server {
 	s := Init()
 	s.pretend = true
 	s.SkipLog = true
-	s.whitelist = []string{"inwhitelist"}
 	s.GoServer.KSclient = *keystoreclient.GetTestClient(".test")
+	s.KSclient.Save(context.Background(), KEY, &pb.Config{})
 
 	return s
 }
@@ -23,19 +24,25 @@ func InitTestServer() *Server {
 func TestPrint(t *testing.T) {
 	server := InitTestServer()
 	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
+	server.Print(context.Background(), &pb.PrintRequest{Text: "hello2", Origin: "inwhitelist"})
 
 	list, err := server.List(context.Background(), &pb.ListRequest{})
 	if err != nil {
 		t.Fatalf("Bad call: %v", err)
 	}
-	if len(list.GetQueue()) != 1 {
+
+	if len(list.GetQueue()) != 2 {
 		t.Errorf("Bad queue: %v", list)
 	}
 
-	server.processPrints(context.Background())
+	err = server.readyToPrint(context.Background())
+	if err != nil {
+		t.Errorf("Bad load: %v", err)
+	}
 
-	if server.prints != 1 {
-		t.Errorf("Unable to print")
+	server.drainQueue()
+	if server.prints != 2 {
+		t.Errorf("Unable to print: %v", server.prints)
 	}
 }
 
@@ -44,10 +51,16 @@ func TestPrintFailOnLoop(t *testing.T) {
 	server.pretendret = fmt.Errorf("Built to fail")
 	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
 
-	err := server.processPrints(context.Background())
+	err := server.readyToPrint(context.Background())
+	if err != nil {
+		t.Errorf("Bad load: %v", err)
+	}
 
-	if err == nil {
-		t.Errorf("Did not fail")
+	// Let some prints go through
+	time.Sleep(time.Second * 2)
+
+	if server.prints != 0 {
+		t.Errorf("Wrong number of prints recorded: %v", server.prints)
 	}
 }
 
@@ -60,10 +73,19 @@ func TestClear(t *testing.T) {
 		t.Errorf("We've recorded %v prints, despite not processing", server.prints)
 	}
 
-	server.Print(context.Background(), &pb.PrintRequest{Text: "hello there", Origin: "inwhitelist"})
-	server.processPrints(context.Background())
+	err := server.readyToPrint(context.Background())
+	if err != nil {
+		t.Errorf("Bad load: %v", err)
+	}
 
-	if server.prints != 1 {
+	err = server.readyToPrint(context.Background())
+	if err != nil {
+		t.Errorf("Bad load: %v", err)
+	}
+
+	server.drainQueue()
+
+	if server.prints != 0 {
 		t.Errorf("Wrong number of prints recorded: %v", server.prints)
 	}
 }
@@ -75,4 +97,25 @@ func TestPrintFail(t *testing.T) {
 	if server.prints > 0 {
 		t.Errorf("Unwhitelisted origin was printed")
 	}
+}
+
+func TestFails(t *testing.T) {
+	s := InitTestServer()
+	s.GoServer.KSclient.Fail = true
+
+	_, err := s.Print(context.Background(), nil)
+	if err == nil {
+		t.Errorf("Print did not fail")
+	}
+
+	_, err = s.Clear(context.Background(), nil)
+	if err == nil {
+		t.Errorf("Print did not fail")
+	}
+
+	_, err = s.List(context.Background(), nil)
+	if err == nil {
+		t.Errorf("Print did not fail")
+	}
+
 }

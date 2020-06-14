@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/brotherlogic/goserver"
-	"github.com/brotherlogic/keystore/client"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/net/context"
@@ -36,45 +35,45 @@ var (
 	})
 )
 
-func (s *Server) load(ctx context.Context) error {
+func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 	config := &pb.Config{}
 	data, _, err := s.KSclient.Read(ctx, KEY, config)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	s.config = data.(*pb.Config)
-	return nil
+	return data.(*pb.Config), nil
 }
 
-func (s *Server) save(ctx context.Context) {
-	s.KSclient.Save(ctx, KEY, s.config)
+func (s *Server) save(ctx context.Context, config *pb.Config) error {
+	return s.KSclient.Save(ctx, KEY, config)
 }
 
 //Server main server type
 type Server struct {
 	*goserver.GoServer
-	whitelist  []string
 	prints     int64
+	printq     chan *pb.PrintRequest
 	pretend    bool // Used for testing only
 	pretendret error
-	config     *pb.Config
+	done       chan bool
 }
 
-func (s *Server) localPrint(text string, lines []string, ti time.Time) error {
+func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Duration, error) {
 	if s.pretend {
-		s.prints++
-		return s.pretendret
+		if s.pretendret == nil {
+			s.prints++
+		}
+		return time.Second, s.pretendret
 	}
 
 	s.Log(fmt.Sprintf("Assessing print at %v", ti))
 	if ti.Hour() < 9 || ti.Hour() > 17 || ((ti.Weekday() == time.Saturday || ti.Weekday() == time.Sunday) && (ti.Hour() != 10)) {
-		return status.Errorf(codes.Unavailable, "Not the time to print right now")
+		return time.Minute, status.Errorf(codes.Unavailable, "Not the time to print right now")
 	}
 
 	s.prints++
-	s.config.TotalPrints++
 	cmd := exec.Command("sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py", text)
 	if len(text) == 0 {
 		all := []string{"sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py"}
@@ -103,23 +102,19 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) error {
 	err = cmd.Wait()
 
 	s.Log(fmt.Sprintf("OUTPUT = %v", output))
-	return err
+	return time.Minute, err
 }
 
 // Init builds the server
 func Init() *Server {
 	s := &Server{
-		&goserver.GoServer{},
-		[]string{
-			"beerserver",
-			"recordprinter",
-		},
-		int64(0),
-		false, // Prod version doesn't pretend to print
-		nil,
-		&pb.Config{},
+		GoServer:   &goserver.GoServer{},
+		prints:     int64(0),
+		pretend:    false, // Prod version doesn't pretend to print
+		pretendret: nil,
+		printq:     make(chan *pb.PrintRequest, 100),
+		done:       make(chan bool),
 	}
-	s.GoServer.KSclient = *keystoreclient.GetClient(s.DialMaster)
 	return s
 }
 
@@ -135,31 +130,40 @@ func (s *Server) ReportHealth() bool {
 
 // Shutdown the server
 func (s *Server) Shutdown(ctx context.Context) error {
-	s.save(ctx)
 	return nil
 }
 
 // Mote promotes/demotes this server
 func (s *Server) Mote(ctx context.Context, master bool) error {
-	if master {
-		return s.load(ctx)
-	}
-
 	return nil
 }
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
-	return []*pbg.State{
-		&pbg.State{Key: "prints", Value: s.prints},
-		&pbg.State{Key: "whitelisted", Value: int64(len(s.whitelist))},
-		&pbg.State{Key: "backlog", Value: int64(len(s.config.Requests))},
+	return []*pbg.State{}
+}
+
+func (s *Server) readyToPrint(ctx context.Context) error {
+	config, err := s.load(ctx)
+	if err != nil {
+		return err
 	}
+	for _, r := range config.GetRequests() {
+		s.printq <- r
+	}
+
+	go s.printQueue()
+
+	return nil
+}
+
+func (s *Server) drainQueue() {
+	close(s.printq)
+	<-s.done
 }
 
 func main() {
 	var quiet = flag.Bool("quiet", false, "Show all output")
-	var init = flag.Bool("init", false, "Init the config")
 	flag.Parse()
 
 	//Turn off logging
@@ -170,20 +174,18 @@ func main() {
 	server := Init()
 	server.PrepServer()
 	server.Register = server
-	err := server.RegisterServerV2("printer", false, false)
+	err := server.RegisterServerV2("printer", false, true)
 	if err != nil {
 		return
 	}
 
-	if *init {
-		ctx, cancel := utils.BuildContext("printer", "printer")
-		defer cancel()
-		server.config.TotalPrints = 1
-		server.save(ctx)
+	//Silent crash is we can't print
+	ctx, cancel := utils.ManualContext("printerstart", "printerstart", time.Minute, true)
+	err = server.readyToPrint(ctx)
+	if err != nil {
 		return
 	}
-
-	server.RegisterRepeatingTask(server.processPrints, "process_prints", time.Minute)
+	cancel()
 
 	fmt.Printf("%v", server.Serve())
 }
