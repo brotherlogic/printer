@@ -148,6 +148,8 @@ func (s *Server) readyToPrint(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
+	Backlog.Set(float64(len(config.GetRequests())))
 	for _, r := range config.GetRequests() {
 		s.printq <- r
 	}
