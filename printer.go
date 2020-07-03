@@ -100,7 +100,7 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 	cmd.Start()
 	err = cmd.Wait()
 
-	s.Log(fmt.Sprintf("OUTPUT = %v", output))
+	s.Log(fmt.Sprintf("OUTPUT = %v from %v -> %v", output, text, lines))
 	return time.Minute, err
 }
 
