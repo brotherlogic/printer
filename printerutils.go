@@ -21,6 +21,7 @@ func (s *Server) printQueue() {
 		}
 
 		time.Sleep(t)
+		Backlog.Set(float64(len(s.printq)))
 	}
 
 	s.done <- true
