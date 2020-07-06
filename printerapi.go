@@ -18,6 +18,7 @@ func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResp
 	req.Id = time.Now().UnixNano()
 	config.Requests = append(config.Requests, req)
 	Backlog.Set(float64(len(config.Requests)))
+	s.printq <- req
 	return &pb.PrintResponse{}, s.save(ctx, config)
 }
 
