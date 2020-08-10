@@ -101,7 +101,7 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 	err = cmd.Wait()
 
 	s.Log(fmt.Sprintf("OUTPUT = [%v] %v", err, output))
-	return time.Minute, err
+	return time.Second * 5, err
 }
 
 // Init builds the server
