@@ -111,7 +111,7 @@ func Init() *Server {
 		prints:     int64(0),
 		pretend:    false, // Prod version doesn't pretend to print
 		pretendret: nil,
-		printq:     make(chan *pb.PrintRequest, 100),
+		printq:     make(chan *pb.PrintRequest, 200),
 		done:       make(chan bool),
 	}
 	return s
