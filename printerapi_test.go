@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brotherlogic/keystore/client"
+	keystoreclient "github.com/brotherlogic/keystore/client"
 
 	pb "github.com/brotherlogic/printer/proto"
 )
@@ -23,6 +23,12 @@ func InitTestServer() *Server {
 
 func TestPrint(t *testing.T) {
 	server := InitTestServer()
+
+	err := server.readyToPrint(context.Background())
+	if err != nil {
+		t.Errorf("Bad load: %v", err)
+	}
+
 	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
 	server.Print(context.Background(), &pb.PrintRequest{Text: "hello2", Origin: "inwhitelist"})
 
@@ -33,11 +39,6 @@ func TestPrint(t *testing.T) {
 
 	if len(list.GetQueue()) != 2 {
 		t.Errorf("Bad queue: %v", list)
-	}
-
-	err = server.readyToPrint(context.Background())
-	if err != nil {
-		t.Errorf("Bad load: %v", err)
 	}
 
 	server.drainQueue()
