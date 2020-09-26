@@ -11,16 +11,22 @@ import (
 
 func (s *Server) printQueue() {
 	for val := range s.printq {
-
 		ctx, cancel := utils.ManualContext("printqueue", "printqueue", time.Minute, true)
-		t, err := s.processPrint(ctx, val)
+
+		_, err := s.load(ctx)
+		var t time.Duration
+
+		if err == nil {
+			t, err = s.processPrint(ctx, val)
+
+			time.Sleep(t)
+		}
 		cancel()
 
 		if err != nil {
 			s.printq <- val
 		}
 
-		time.Sleep(t)
 		Backlog.Set(float64(len(s.printq)))
 	}
 
@@ -38,6 +44,7 @@ func (s *Server) dequeue(ctx context.Context, reqrem *pb.PrintRequest) error {
 			newList = append(newList, req)
 		}
 	}
+
 	config.Requests = newList
 	Backlog.Set(float64(len(config.Requests)))
 	return s.save(ctx, config)
