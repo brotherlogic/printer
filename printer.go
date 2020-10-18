@@ -73,6 +73,8 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 	}
 
 	s.prints++
+	s.Log(fmt.Sprintf("PRINTING: %v", lines))
+
 	cmd := exec.Command("sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py", text)
 	if len(text) == 0 {
 		all := []string{"sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py"}

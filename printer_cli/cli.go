@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/brotherlogic/goserver/utils"
-	"google.golang.org/grpc"
 
 	pbp "github.com/brotherlogic/printer/proto"
 
@@ -19,14 +17,17 @@ func main() {
 	ctx, cancel := utils.BuildContext("PrintCLI", "printer")
 	defer cancel()
 
-	host, port, _ := utils.Resolve("printer", "printer-cli")
-	conn, _ := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	conn, err := utils.LFDialServer(ctx, "printer")
+	if err != nil {
+		log.Fatalf("Bad dial: %v", err)
+	}
 	defer conn.Close()
 
 	client := pbp.NewPrintServiceClient(conn)
 
 	if os.Args[1] == "clear" {
-		client.Clear(ctx, &pbp.ClearRequest{})
+		_, err := client.Clear(ctx, &pbp.ClearRequest{})
+		fmt.Printf("CLEAR: %v\n", err)
 	} else if os.Args[1] == "list" {
 		re, err := client.List(ctx, &pbp.ListRequest{})
 		if err != nil {
