@@ -68,16 +68,16 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 		return time.Second, s.pretendret
 	}
 
-	//if ti.Hour() < 9 || ti.Hour() > 17 { // || ((ti.Weekday() == time.Saturday || ti.Weekday() == time.Sunday) && (ti.Hour() != 10)) {
-	return time.Minute, status.Errorf(codes.Unavailable, "Not the time to print right now")
-	//}
+	if ti.Hour() < 9 || ti.Hour() > 17 { // || ((ti.Weekday() == time.Saturday || ti.Weekday() == time.Sunday) && (ti.Hour() != 10)) {
+		return time.Minute, status.Errorf(codes.Unavailable, "Not the time to print right now")
+	}
 
 	s.prints++
 	s.Log(fmt.Sprintf("PRINTING: %v", lines))
 
-	cmd := exec.Command("sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py", text)
+	cmd := exec.Command("sudo", "python3", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py", text)
 	if len(text) == 0 {
-		all := []string{"sudo", "python", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py"}
+		all := []string{"sudo", "python3", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py"}
 		all = append(all, lines...)
 		cmd = exec.Command("sudo", all...)
 	}
