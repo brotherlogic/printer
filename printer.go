@@ -116,7 +116,7 @@ func Init() *Server {
 		pretendret: nil,
 		printq:     make(chan *pb.PrintRequest, 200),
 		done:       make(chan bool),
-		outOfPaper: true,
+		outOfPaper: false,
 	}
 	return s
 }
