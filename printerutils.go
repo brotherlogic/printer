@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/brotherlogic/goserver/utils"
@@ -18,6 +19,10 @@ func (s *Server) printQueue() {
 
 		if err == nil {
 			t, err = s.processPrint(ctx, val)
+
+			if err != nil {
+				s.RaiseIssue("Unable to print", fmt.Sprintf("Cannot print: %v", err))
+			}
 
 			time.Sleep(t)
 		}
