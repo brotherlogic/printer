@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"golang.org/x/net/context"
@@ -12,7 +13,7 @@ import (
 func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResponse, error) {
 	//Don't print it we're out of paper
 	if s.outOfPaper {
-		return nil,. fmt.Errorf("Out of paper")
+		return nil, fmt.Errorf("Out of paper")
 	}
 
 	config, err := s.load(ctx)
