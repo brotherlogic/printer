@@ -192,5 +192,6 @@ func main() {
 	}
 	cancel()
 
+	server.Log(fmt.Sprintf("PRETEND PRINTING %v", server.pretend))
 	fmt.Printf("%v", server.Serve())
 }
