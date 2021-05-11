@@ -112,7 +112,7 @@ func Init() *Server {
 	s := &Server{
 		GoServer:   &goserver.GoServer{},
 		prints:     int64(0),
-		pretend:    true, // Prod version doesn't pretend to print
+		pretend:    false, // Prod version doesn't pretend to print
 		pretendret: nil,
 		printq:     make(chan *pb.PrintRequest, 200),
 		done:       make(chan bool),
