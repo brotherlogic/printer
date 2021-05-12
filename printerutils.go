@@ -20,10 +20,13 @@ func (s *Server) printQueue() {
 		var t time.Duration
 
 		if err == nil {
-			t, err = s.processPrint(ctx, val)
-
-			if err != nil && status.Convert(err).Code() != codes.Unavailable {
-				s.RaiseIssue("Unable to print", fmt.Sprintf("Cannot print: %v", err))
+			for i := 0; i < len(val.GetLines()); i++ {
+				t, err = s.processPrint(ctx, val)
+				if err != nil && status.Convert(err).Code() != codes.Unavailable {
+					s.RaiseIssue("Unable to print", fmt.Sprintf("Cannot print: %v", err))
+					break
+				}
+				val.LinePointer++
 			}
 
 			time.Sleep(t)
@@ -58,7 +61,7 @@ func (s *Server) dequeue(ctx context.Context, reqrem *pb.PrintRequest) error {
 }
 
 func (s *Server) processPrint(ctx context.Context, req *pb.PrintRequest) (time.Duration, error) {
-	t, err := s.localPrint(req.Text, req.Lines, time.Now())
+	t, err := s.localPrint(req.Text, req.Lines[req.LinePointer], time.Now())
 
 	if err != nil {
 		return t, err
