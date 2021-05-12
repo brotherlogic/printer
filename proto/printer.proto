@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package printer;
 
+option go_package = "github.com/brotherlogic/printer/proto";
+
 message Config {
   repeated PrintRequest requests = 1;
   int64 total_prints = 2;
@@ -12,6 +14,7 @@ message PrintRequest {
   repeated string lines = 2;
   string origin = 3;
   int64 id = 4;
+  int32 line_pointer = 5;
 }
 
 message PrintResponse {}
