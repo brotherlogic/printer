@@ -29,6 +29,8 @@ func (s *Server) printQueue() {
 				val.LinePointer++
 			}
 
+			s.processPrint(ctx, nil)
+
 			time.Sleep(t)
 		}
 		cancel()
@@ -61,11 +63,16 @@ func (s *Server) dequeue(ctx context.Context, reqrem *pb.PrintRequest) error {
 }
 
 func (s *Server) processPrint(ctx context.Context, req *pb.PrintRequest) (time.Duration, error) {
-	t, err := s.localPrint(req.Text, req.Lines[req.LinePointer], time.Now())
+	if req != nil {
+		t, err := s.localPrint(req.Text, req.Lines[req.LinePointer], time.Now())
 
-	if err != nil {
-		return t, err
+		if err != nil {
+			return t, err
+		}
+
+		return t, s.dequeue(ctx, req)
+	} else {
+		s.localPrint("", "", time.Now())
+		return time.Second, nil
 	}
-
-	return t, s.dequeue(ctx, req)
 }
