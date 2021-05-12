@@ -6,6 +6,8 @@ import (
 
 	"github.com/brotherlogic/goserver/utils"
 	"golang.org/x/net/context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	pb "github.com/brotherlogic/printer/proto"
 )
@@ -20,7 +22,7 @@ func (s *Server) printQueue() {
 		if err == nil {
 			t, err = s.processPrint(ctx, val)
 
-			if err != nil {
+			if err != nil && status.Convert(err).Code() != codes.Unavailable {
 				s.RaiseIssue("Unable to print", fmt.Sprintf("Cannot print: %v", err))
 			}
 
