@@ -61,7 +61,7 @@ type Server struct {
 	outOfPaper bool
 }
 
-func (s *Server) localPrint(text string, lines string, ti time.Time) (time.Duration, error) {
+func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Duration, error) {
 	if s.pretend {
 		if s.pretendret == nil {
 			s.prints++
@@ -79,7 +79,7 @@ func (s *Server) localPrint(text string, lines string, ti time.Time) (time.Durat
 	cmd := exec.Command("sudo", "python3", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py", text)
 	if len(text) == 0 {
 		all := []string{"sudo", "python3", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py"}
-		all = append(all, lines)
+		all = append(all, lines...)
 		cmd = exec.Command("sudo", all...)
 	}
 
