@@ -73,6 +73,7 @@ func (s *Server) processPrint(ctx context.Context, req *pb.PrintRequest) (time.D
 		return t, s.dequeue(ctx, req)
 	} else {
 		s.localPrint("", "", time.Now())
+		s.localPrint("", "", time.Now())
 		return time.Second, nil
 	}
 }
