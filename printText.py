@@ -10,3 +10,4 @@ if not printer.hasPaper():
     
 for line in sys.argv[1:]:
     printer.println(line)
+printer.feed(3)
