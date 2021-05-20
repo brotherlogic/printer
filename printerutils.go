@@ -23,7 +23,6 @@ func (s *Server) printQueue() {
 			t, err = s.processPrint(ctx, val)
 			if err != nil && status.Convert(err).Code() != codes.Unavailable {
 				s.RaiseIssue("Unable to print", fmt.Sprintf("Cannot print: %v", err))
-				break
 			}
 
 			time.Sleep(t)
