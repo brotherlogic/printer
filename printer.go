@@ -188,6 +188,7 @@ func main() {
 	ctx, cancel := utils.ManualContext("printerstart", "printerstart", time.Minute, true)
 	err = server.readyToPrint(ctx)
 	if err != nil {
+		server.Log(fmt.Sprintf("Not ready to print: %v", err))
 		return
 	}
 	cancel()
