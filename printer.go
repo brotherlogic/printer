@@ -189,6 +189,7 @@ func main() {
 	err = server.readyToPrint(ctx)
 	if err != nil {
 		server.Log(fmt.Sprintf("Not ready to print: %v", err))
+		time.Sleep(time.Minute)
 		return
 	}
 	cancel()
