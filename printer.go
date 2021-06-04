@@ -33,6 +33,10 @@ var (
 		Name: "printer_backlog",
 		Help: "The size of the print queue",
 	})
+	printErrors = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "printer_errors",
+		Help: "The size of the print queue",
+	}, []string{"error"})
 )
 
 func (s *Server) load(ctx context.Context) (*pb.Config, error) {

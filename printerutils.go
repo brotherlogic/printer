@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/brotherlogic/goserver/utils"
+	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -30,6 +31,7 @@ func (s *Server) printQueue() {
 		cancel()
 
 		if err != nil {
+			printErrors.With(prometheus.Labels{"error": fmt.Sprintf("%v", err)}).Inc()
 			s.printq <- val
 		}
 
