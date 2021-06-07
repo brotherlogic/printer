@@ -189,7 +189,7 @@ func main() {
 	}
 
 	//Silent crash is we can't print
-	ctx, cancel := utils.ManualContext("printerstart", "printerstart", time.Minute, true)
+	ctx, cancel := utils.ManualContext("printerstart", time.Minute)
 	err = server.readyToPrint(ctx)
 	if err != nil {
 		server.Log(fmt.Sprintf("Not ready to print: %v", err))

@@ -15,7 +15,7 @@ import (
 
 func (s *Server) printQueue() {
 	for val := range s.printq {
-		ctx, cancel := utils.ManualContext("printqueue", "printqueue", time.Minute, true)
+		ctx, cancel := utils.ManualContext("printqueue", time.Minute)
 
 		_, err := s.load(ctx)
 		var t time.Duration
