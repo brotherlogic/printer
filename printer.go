@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"time"
 
@@ -80,13 +81,22 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 	s.prints++
 	s.Log(fmt.Sprintf("PRINTING: %v", lines))
 
-	cmd := exec.Command("sudo", "python3", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py", text)
-	if len(text) == 0 {
-		all := []string{"sudo", "python3", "/home/simon/gobuild/src/github.com/brotherlogic/printer/printText.py"}
-		all = append(all, lines...)
-		cmd = exec.Command("sudo", all...)
+	if len(text) != 0 {
+		ioutil.WriteFile("/home/simon/print.txt", []byte(text), 0644)
+	} else {
+		os.Create("home/simon/print.txt")
+		handle, err := os.Open("home/simon/print.txt")
+		if err != nil {
+			return time.Second, err
+		}
+		for _, line := range lines {
+			handle.WriteString(fmt.Sprintf("%v\n", line))
+		}
+		handle.Sync()
+		handle.Close()
 	}
 
+	cmd := exec.Command("lp", "/home/simon/print.txt")
 	output := ""
 	out, err := cmd.StdoutPipe()
 
