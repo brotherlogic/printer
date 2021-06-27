@@ -106,7 +106,7 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 	out, err := cmd.StdoutPipe()
 
 	if err != nil {
-		s.Log(fmt.Sprintf("Error in the overall stdout: %v", err))
+		s.Log(fmt.Sprintf("Error in the actual stdout: %v", err))
 	}
 
 	if out != nil {
