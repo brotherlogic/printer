@@ -92,6 +92,10 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 		for _, line := range lines {
 			handle.WriteString(fmt.Sprintf("%v\n", line))
 		}
+		//Feed
+		for i := 0; i < 5; i++ {
+			handle.WriteString("\n")
+		}
 		handle.Sync()
 		handle.Close()
 	}
