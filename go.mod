@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/brotherlogic/discovery v0.0.0-20210626180714-1ae56396f4e1 // indirect
+	github.com/brotherlogic/gobuildslave v0.0.0-20210626211527-ff107a8a9b1d // indirect
 	github.com/brotherlogic/goserver v0.0.0-20210615034723-54a9e8564a59
 	github.com/brotherlogic/keystore v0.0.0-20201029130503-da423c07fd79
 	github.com/golang/protobuf v1.5.2
