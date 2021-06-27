@@ -79,13 +79,13 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 	}
 
 	s.prints++
-	s.Log(fmt.Sprintf("PRINTING: %v", lines))
+	s.Log(fmt.Sprintf("NOW PRINTING: %v", lines))
 
 	if len(text) != 0 {
 		ioutil.WriteFile("/home/simon/print.txt", []byte(text), 0644)
 	} else {
 		os.Create("home/simon/print.txt")
-		handle, err := os.Open("home/simon/print.txt")
+		handle, err := os.Open("/home/simon/print.txt")
 		if err != nil {
 			return time.Second, err
 		}
