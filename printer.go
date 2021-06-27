@@ -84,7 +84,7 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 		ioutil.WriteFile("/home/simon/print.txt", []byte(text), 0644)
 	} else {
 		//os.Create("home/simon/print.txt")
-		handle, err := os.Open("/home/simon/print.txt")
+		handle, err := os.Create("/home/simon/print.txt")
 		if err != nil {
 			return time.Second, err
 		}
