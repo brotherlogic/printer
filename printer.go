@@ -97,7 +97,7 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 		}
 		serr := handle.Sync()
 		cerr := handle.Close()
-		s.Log(fmt.Sprintf("NOW LINES %v -> close errors are %v and %v", lines, serr, cerr))
+		s.Log(fmt.Sprintf("WHAT NOW LINES %v -> close errors are %v and %v", lines, serr, cerr))
 	}
 
 	cmd := exec.Command("lp", "/home/simon/print.txt")
