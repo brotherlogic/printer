@@ -96,8 +96,9 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 		for i := 0; i < 5; i++ {
 			handle.WriteString("\n")
 		}
-		handle.Sync()
-		handle.Close()
+		serr := handle.Sync()
+		cerr := handle.Close()
+		s.Log(fmt.Sprintf("CLOSE %v and %v", serr, cerr))
 	}
 
 	cmd := exec.Command("lp", "/home/simon/print.txt")
