@@ -79,7 +79,6 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 	}
 
 	s.prints++
-	s.Log(fmt.Sprintf("NOW PRINTING: %v", lines))
 
 	if len(text) != 0 {
 		ioutil.WriteFile("/home/simon/print.txt", []byte(text), 0644)
@@ -98,7 +97,7 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 		}
 		serr := handle.Sync()
 		cerr := handle.Close()
-		s.Log(fmt.Sprintf("CLOSE %v and %v", serr, cerr))
+		s.Log(fmt.Sprintf("LINES %v -> CLOSE %v and %v", lines, serr, cerr))
 	}
 
 	cmd := exec.Command("lp", "/home/simon/print.txt")
