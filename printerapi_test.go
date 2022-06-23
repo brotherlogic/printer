@@ -15,6 +15,7 @@ func InitTestServer() *Server {
 	s := Init()
 	s.pretend = true
 	s.SkipLog = true
+	s.SkipIssue = true
 	s.GoServer.KSclient = *keystoreclient.GetTestClient(".test")
 	s.KSclient.Save(context.Background(), KEY, &pb.Config{})
 

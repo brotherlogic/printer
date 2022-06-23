@@ -78,6 +78,11 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 		return time.Minute, status.Errorf(codes.Unavailable, "Not the time to print right now")
 	}
 
+	//Only print if it's five to the hour
+	if ti.Minute() < 55 {
+		return time.Minute, status.Errorf(codes.Unavailable, "Only print at five to the hour")
+	}
+
 	s.prints++
 
 	if len(text) != 0 {
