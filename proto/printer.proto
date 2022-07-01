@@ -15,6 +15,7 @@ message PrintRequest {
   string origin = 3;
   int64 id = 4;
   int32 line_pointer = 5;
+  bool override = 6;
 }
 
 message PrintResponse {}

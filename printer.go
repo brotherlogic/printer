@@ -66,7 +66,7 @@ type Server struct {
 	outOfPaper bool
 }
 
-func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Duration, error) {
+func (s *Server) localPrint(text string, lines []string, ti time.Time, override bool) (time.Duration, error) {
 	if s.pretend {
 		if s.pretendret == nil {
 			s.prints++
@@ -79,7 +79,7 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time) (time.Dur
 	}
 
 	//Only print if it's five to the hour
-	if ti.Minute() < 55 {
+	if override || ti.Minute() < 55 {
 		return time.Minute, status.Errorf(codes.Unavailable, "Only print at five to the hour")
 	}
 
