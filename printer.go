@@ -80,8 +80,10 @@ func (s *Server) localPrint(text string, lines []string, ti time.Time, override 
 	}
 
 	//Only print if it's five to the hour
-	if !override && ti.Minute() < 55 {
-		return time.Minute, status.Errorf(codes.Unavailable, "Only print at five to the hour")
+	if ti.Weekday() != time.Saturday && ti.Weekday() != time.Sunday {
+		if !override && ti.Minute() < 55 {
+			return time.Minute, status.Errorf(codes.Unavailable, "Only print at five to the hour")
+		}
 	}
 
 	s.prints++
