@@ -25,7 +25,7 @@ func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResp
 	config.Requests = append(config.Requests, req)
 	Backlog.Set(float64(len(config.Requests)))
 	s.printq <- req
-	return &pb.PrintResponse{}, s.save(ctx, config)
+	return &pb.PrintResponse{Uid: req.Id}, s.save(ctx, config)
 }
 
 // Clear clears all the backlog
@@ -34,7 +34,18 @@ func (s *Server) Clear(ctx context.Context, req *pb.ClearRequest) (*pb.ClearResp
 	if err != nil {
 		return nil, err
 	}
-	config.Requests = nil
+
+	if req.GetUid() > 0 {
+		rs := []*pb.PrintRequest{}
+		for _, req := range config.Requests {
+			if req.Id != req.GetId() {
+				rs = append(rs, req)
+			}
+		}
+		config.Requests = rs
+	} else {
+		config.Requests = nil
+	}
 	return &pb.ClearResponse{}, s.save(ctx, config)
 }
 

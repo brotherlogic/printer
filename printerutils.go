@@ -17,10 +17,17 @@ func (s *Server) printQueue() {
 	for val := range s.printq {
 		ctx, cancel := utils.ManualContext("printqueue", time.Minute)
 
-		_, err := s.load(ctx)
+		config, err := s.load(ctx)
 		var t time.Duration
 
-		if err == nil {
+		stillInQueue := false
+		for _, entry := range config.GetRequests() {
+			if val.Id == entry.Id {
+				stillInQueue = true
+			}
+		}
+
+		if err == nil && stillInQueue {
 			t, err = s.processPrint(ctx, val)
 			if err != nil && status.Convert(err).Code() != codes.Unavailable {
 				s.RaiseIssue("Unable to print", fmt.Sprintf("Cannot print: %v", err))

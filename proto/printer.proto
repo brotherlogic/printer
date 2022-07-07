@@ -18,9 +18,13 @@ message PrintRequest {
   bool override = 6;
 }
 
-message PrintResponse {}
+message PrintResponse {
+  int64 uid = 1;
+}
 
-message ClearRequest {}
+message ClearRequest {
+  int64 uid = 1;
+}
 
 message ClearResponse {}
 
