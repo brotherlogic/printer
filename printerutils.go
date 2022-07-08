@@ -27,6 +27,7 @@ func (s *Server) printQueue() {
 			}
 		}
 
+		s.CtxLog(ctx, fmt.Sprintf("Printing %v -> %v", val, stillInQueue))
 		if err == nil && stillInQueue {
 			t, err = s.processPrint(ctx, val)
 			if err != nil && status.Convert(err).Code() != codes.Unavailable {
