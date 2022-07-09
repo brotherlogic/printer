@@ -15,6 +15,7 @@ import (
 
 func (s *Server) printQueue() {
 	for val := range s.printq {
+		goqueue.Set(float64(len(s.printq)))
 		ctx, cancel := utils.ManualContext("printqueue", time.Minute)
 
 		config, err := s.load(ctx)
