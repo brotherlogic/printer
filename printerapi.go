@@ -25,7 +25,7 @@ func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResp
 	config.Requests = append(config.Requests, req)
 	s.CtxLog(ctx, fmt.Sprintf("Added to queue %v", req))
 
-	err = s.save(ctx, confgi)
+	err = s.save(ctx, config)
 
 	if err == nil {
 		s.printq <- req
