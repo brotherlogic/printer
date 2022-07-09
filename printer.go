@@ -29,8 +29,7 @@ const (
 )
 
 var (
-	//Backlog - the print queue
-	Backlog = promauto.NewGauge(prometheus.GaugeOpts{
+	backlog = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "printer_backlog",
 		Help: "The size of the print queue",
 	})
@@ -40,6 +39,10 @@ var (
 	}, []string{"error"})
 )
 
+func (s *Server) metrics(config *pb.Config) {
+	backlog.Set(float64(len(config.GetRequests())))
+}
+
 func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 	config := &pb.Config{}
 	data, _, err := s.KSclient.Read(ctx, KEY, config)
@@ -48,10 +51,12 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 		return nil, err
 	}
 
+	s.metrics(data.(*pb.Config))
 	return data.(*pb.Config), nil
 }
 
 func (s *Server) save(ctx context.Context, config *pb.Config) error {
+	s.metrics(config)
 	return s.KSclient.Save(ctx, KEY, config)
 }
 
@@ -174,7 +179,6 @@ func (s *Server) readyToPrint(ctx context.Context) error {
 		return err
 	}
 
-	Backlog.Set(float64(len(config.GetRequests())))
 	for _, r := range config.GetRequests() {
 		s.printq <- r
 	}

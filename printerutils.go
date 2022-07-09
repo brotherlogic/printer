@@ -43,7 +43,6 @@ func (s *Server) printQueue() {
 			s.printq <- val
 		}
 
-		Backlog.Set(float64(len(s.printq)))
 	}
 
 	s.done <- true
@@ -62,7 +61,6 @@ func (s *Server) dequeue(ctx context.Context, reqrem *pb.PrintRequest) error {
 	}
 
 	config.Requests = newList
-	Backlog.Set(float64(len(config.Requests)))
 	return s.save(ctx, config)
 }
 
