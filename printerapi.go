@@ -23,8 +23,15 @@ func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResp
 
 	req.Id = time.Now().UnixNano()
 	config.Requests = append(config.Requests, req)
-	s.printq <- req
-	return &pb.PrintResponse{Uid: req.Id}, s.save(ctx, config)
+	s.CtxLog(ctx, fmt.Sprintf("Added to queue %v", req))
+
+	err = s.save(ctx, confgi)
+
+	if err == nil {
+		s.printq <- req
+	}
+
+	return &pb.PrintResponse{Uid: req.Id}, err
 }
 
 // Clear clears all the backlog
