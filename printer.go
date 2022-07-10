@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"sync"
 	"time"
 
 	"github.com/brotherlogic/goserver"
@@ -72,6 +73,7 @@ type Server struct {
 	pretend    bool // Used for testing only
 	pretendret error
 	done       chan bool
+	printlock  *sync.Mutex
 }
 
 func (s *Server) localPrint(ctx context.Context, text string, lines []string, ti time.Time, override bool) (time.Duration, error) {
@@ -144,6 +146,7 @@ func Init() *Server {
 		pretendret: nil,
 		printq:     make(chan *pb.PrintRequest, 200),
 		done:       make(chan bool),
+		printlock:  &sync.Mutex{},
 	}
 	return s
 }

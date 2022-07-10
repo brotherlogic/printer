@@ -10,6 +10,8 @@ import (
 
 // Print performs a print
 func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResponse, error) {
+	s.printlock.Lock()
+	defer s.printlock.Unlock()
 	config, err := s.load(ctx)
 	if err != nil {
 		return nil, err
@@ -29,6 +31,8 @@ func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResp
 
 // Clear clears all the backlog
 func (s *Server) Clear(ctx context.Context, req *pb.ClearRequest) (*pb.ClearResponse, error) {
+	s.printlock.Lock()
+	defer s.printlock.Unlock()
 	config, err := s.load(ctx)
 	if err != nil {
 		return nil, err

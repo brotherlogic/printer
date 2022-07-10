@@ -15,6 +15,7 @@ import (
 
 func (s *Server) printQueue() {
 	for val := range s.printq {
+		s.printlock.Lock()
 		goqueue.Set(float64(len(s.printq)))
 		ctx, cancel := utils.ManualContext("printqueue", time.Minute)
 
@@ -28,14 +29,13 @@ func (s *Server) printQueue() {
 			}
 		}
 
-		s.CtxLog(ctx, fmt.Sprintf("Printing %v -> %v", val, stillInQueue))
+		s.CtxLog(ctx, fmt.Sprintf("Printing %v -> %v (%v)", val, stillInQueue, config.GetRequests()))
 		if err == nil && stillInQueue {
 			t, err = s.processPrint(ctx, val)
 			if err != nil && status.Convert(err).Code() != codes.Unavailable {
 				s.RaiseIssue("Unable to print", fmt.Sprintf("Cannot print: %v", err))
 			}
 
-			time.Sleep(t)
 		} else {
 			s.CtxLog(ctx, fmt.Sprintf("%v is not in queue: %v", val, config.GetRequests()))
 		}
@@ -46,6 +46,8 @@ func (s *Server) printQueue() {
 			s.printq <- val
 		}
 
+		s.printlock.Unlock()
+		time.Sleep(t)
 	}
 
 	s.done <- true
