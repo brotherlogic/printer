@@ -92,6 +92,40 @@ func TestClear(t *testing.T) {
 	}
 }
 
+func TestClearSingle(t *testing.T) {
+	server := InitTestServer()
+	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
+	res, _ := server.Print(context.Background(), &pb.PrintRequest{Text: "hello2", Origin: "inwhitelist"})
+
+	if res.GetUid() == 0 {
+		t.Fatalf("Print element has no UID: %v", res)
+	}
+
+	server.Clear(context.Background(), &pb.ClearRequest{Uid: res.GetUid()})
+
+	if server.prints != 0 {
+		t.Errorf("We've recorded %v prints, despite not processing", server.prints)
+	}
+
+	err := server.readyToPrint(context.Background())
+	if err != nil {
+		t.Errorf("Bad load: %v", err)
+	}
+
+	err = server.readyToPrint(context.Background())
+	if err != nil {
+		t.Errorf("Bad load: %v", err)
+	}
+
+	time.Sleep(time.Second * 5)
+
+	server.drainQueue()
+
+	if server.prints != 1 {
+		t.Errorf("Wrong number of prints recorded: %v", server.prints)
+	}
+}
+
 func TestPrintFail(t *testing.T) {
 	server := InitTestServer()
 	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "notinwhitelist"})

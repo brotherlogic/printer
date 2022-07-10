@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"golang.org/x/net/context"
@@ -18,7 +17,6 @@ func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResp
 
 	req.Id = time.Now().UnixNano()
 	config.Requests = append(config.Requests, req)
-	s.CtxLog(ctx, fmt.Sprintf("Added to queue %v", req))
 
 	err = s.save(ctx, config)
 
@@ -38,9 +36,9 @@ func (s *Server) Clear(ctx context.Context, req *pb.ClearRequest) (*pb.ClearResp
 
 	if req.GetUid() > 0 {
 		rs := []*pb.PrintRequest{}
-		for _, req := range config.Requests {
-			if req.Id != req.GetId() {
-				rs = append(rs, req)
+		for _, pr := range config.Requests {
+			if pr.Id != req.GetUid() {
+				rs = append(rs, pr)
 			}
 		}
 		config.Requests = rs

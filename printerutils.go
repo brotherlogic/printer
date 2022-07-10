@@ -36,6 +36,8 @@ func (s *Server) printQueue() {
 			}
 
 			time.Sleep(t)
+		} else {
+			s.CtxLog(ctx, fmt.Sprintf("%v is not in queue: %v", val, config.GetRequests()))
 		}
 		cancel()
 
