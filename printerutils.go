@@ -71,7 +71,7 @@ func (s *Server) dequeue(ctx context.Context, reqrem *pb.PrintRequest) error {
 
 func (s *Server) processPrint(ctx context.Context, req *pb.PrintRequest) (time.Duration, error) {
 	if req != nil {
-		t, err := s.localPrints(ctx, req.Text, req.Lines, time.Now(), req.GetOverride())
+		t, err := s.localPrinte(ctx, req.Text, req.Lines, time.Now(), req.GetOverride())
 
 		if err != nil {
 			return t, err
