@@ -11,11 +11,6 @@ import (
 
 // Print performs a print
 func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResponse, error) {
-	//Don't print it we're out of paper
-	if s.outOfPaper {
-		return nil, fmt.Errorf("Out of paper")
-	}
-
 	config, err := s.load(ctx)
 	if err != nil {
 		return nil, err
