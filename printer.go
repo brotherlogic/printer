@@ -74,8 +74,8 @@ type Server struct {
 	done       chan bool
 }
 
-func (s *Server) localPrint(text string, lines []string, ti time.Time, override bool) (time.Duration, error) {
-	s.Log(fmt.Sprintf("Trying to print %v/%v -> %v", text, lines, override))
+func (s *Server) localPrint(ctx context.Context, text string, lines []string, ti time.Time, override bool) (time.Duration, error) {
+	s.CtxLog(ctx, fmt.Sprintf("Trying to print %v/%v -> %v", text, lines, override))
 	if s.pretend {
 		if s.pretendret == nil {
 			s.prints++
