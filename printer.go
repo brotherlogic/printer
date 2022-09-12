@@ -109,7 +109,7 @@ func (s *Server) localPrint(ctx context.Context, text string, lines []string, ti
 		}
 		serr := handle.Sync()
 		cerr := handle.Close()
-		s.Log(fmt.Sprintf("WHAT NOW LINES %v -> close errors are %v and %v", lines, serr, cerr))
+		s.CtxLog(ctx, fmt.Sprintf("WHAT NOW LINES %v -> close errors are %v and %v", lines, serr, cerr))
 	}
 
 	cmd := exec.Command("lp", "/home/simon/print.txt")
@@ -117,7 +117,7 @@ func (s *Server) localPrint(ctx context.Context, text string, lines []string, ti
 	out, err := cmd.StdoutPipe()
 
 	if err != nil {
-		s.Log(fmt.Sprintf("Error in the now resolved actual stdout: %v", err))
+		s.CtxLog(ctx, fmt.Sprintf("Error in the now resolved actual stdout: %v", err))
 	}
 
 	if out != nil {
@@ -133,7 +133,7 @@ func (s *Server) localPrint(ctx context.Context, text string, lines []string, ti
 	cmd.Start()
 	err = cmd.Wait()
 
-	s.Log(fmt.Sprintf("OUTPUT = [%v] %v", err, output))
+	s.CtxLog(ctx, fmt.Sprintf("OUTPUT = [%v] %v", err, output))
 	return time.Second * 5, err
 }
 
@@ -217,12 +217,12 @@ func main() {
 	ctx, cancel := utils.ManualContext("printerstart", time.Minute)
 	err = server.readyToPrint(ctx)
 	if err != nil {
-		server.Log(fmt.Sprintf("Not ready to print: %v", err))
+		server.CtxLog(ctx, fmt.Sprintf("Not ready to print: %v", err))
 		time.Sleep(time.Minute)
 		return
 	}
-	cancel()
 
-	server.Log(fmt.Sprintf("PRETEND PRINTING %v", server.pretend))
+	server.CtxLog(ctx, fmt.Sprintf("PRETEND PRINTING %v", server.pretend))
+	cancel()
 	fmt.Printf("%v", server.Serve())
 }
