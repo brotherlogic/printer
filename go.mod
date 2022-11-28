@@ -3,7 +3,7 @@ module github.com/brotherlogic/printer
 go 1.13
 
 require (
-	github.com/brotherlogic/githubcard v0.0.0-20221128055019-ea6f46c36534 // indirect
+	github.com/brotherlogic/githubcard v0.0.0-20221128055149-66f05daea5a4 // indirect
 	github.com/brotherlogic/goserver v0.0.0-20221106165541-0672428e3628
 	github.com/brotherlogic/keystore v0.0.0-20221118101511-9bbbd1bfa3b7
 	github.com/golang/protobuf v1.5.2
