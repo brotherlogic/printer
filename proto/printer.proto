@@ -34,8 +34,12 @@ message ListResponse {
   repeated PrintRequest queue = 1;
 }
 
+message PingRequest {}
+message PingResponse {}
+
 service PrintService {
   rpc Print(PrintRequest) returns (PrintResponse) {};
   rpc Clear(ClearRequest) returns (ClearResponse) {};
   rpc List(ListRequest) returns (ListResponse) {};
+  rpc Ping(PingRequest) returns (PingResponse) {};
 }
