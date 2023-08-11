@@ -65,7 +65,7 @@ func (s *Server) save(ctx context.Context, config *pb.Config) error {
 	return s.KSclient.Save(ctx, KEY, config)
 }
 
-//Server main server type
+// Server main server type
 type Server struct {
 	*goserver.GoServer
 	prints     int64

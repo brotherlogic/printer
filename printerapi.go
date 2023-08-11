@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
-	"time"
 
 	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 
 	pb "github.com/brotherlogic/printer/proto"
+	pqpb "github.com/brotherlogic/printqueue/proto"
 )
 
 func (s *Server) Ping(ctx context.Context, req *pb.PingRequest) (*pb.PingResponse, error) {
@@ -28,23 +30,28 @@ func (s *Server) Ping(ctx context.Context, req *pb.PingRequest) (*pb.PingRespons
 
 // Print performs a print
 func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResponse, error) {
-	s.printlock.Lock()
-	defer s.printlock.Unlock()
-	config, err := s.load(ctx)
+	// Reflect this over to the printqueue
+	conn, err := grpc.Dial("printqueue.brotherlogic-backend.com:80", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	client := pqpb.NewPrintServiceClient(conn)
+	urgency := pqpb.Urgency_URGENCY_REGULAR
+	if req.GetOverride() {
+		urgency = pqpb.Urgency_URGENCY_IMMEDIATE
+	}
+	_, err = client.Print(ctx, &pqpb.PrintRequest{
+		Lines:       req.GetLines(),
+		Urgency:     urgency,
+		Destination: pqpb.Destination_DESTINATION_RECEIPT,
+		Origin:      req.GetOrigin(),
+		Fanout:      pqpb.Fanout_FANOUT_ONE,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	req.Id = time.Now().UnixNano()
-	config.Requests = append(config.Requests, req)
-
-	err = s.save(ctx, config)
-
-	if err == nil {
-		s.printq <- req
-	}
-
-	return &pb.PrintResponse{Uid: req.Id}, err
+	return &pb.PrintResponse{}, err
 }
 
 // Clear clears all the backlog
