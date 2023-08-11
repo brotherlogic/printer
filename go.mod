@@ -22,6 +22,7 @@ require (
 	github.com/brotherlogic/lock v0.0.0-20230808002205-d5c7afd60a1e // indirect
 	github.com/brotherlogic/logging v0.0.0-20230808212725-1415a37107ed // indirect
 	github.com/brotherlogic/monitor v0.0.0-20221025152653-c10877c5f9e6 // indirect
+	github.com/brotherlogic/printqueue v0.27.0 // indirect
 	github.com/brotherlogic/versionserver v0.0.0-20221025154054-c9bcd41be2f2 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
