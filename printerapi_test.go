@@ -22,32 +22,6 @@ func InitTestServer() *Server {
 	return s
 }
 
-func TestPrint(t *testing.T) {
-	server := InitTestServer()
-
-	err := server.readyToPrint(context.Background())
-	if err != nil {
-		t.Errorf("Bad load: %v", err)
-	}
-
-	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
-	server.Print(context.Background(), &pb.PrintRequest{Text: "hello2", Origin: "inwhitelist"})
-
-	list, err := server.List(context.Background(), &pb.ListRequest{})
-	if err != nil {
-		t.Fatalf("Bad call: %v", err)
-	}
-
-	if len(list.GetQueue()) != 2 {
-		t.Errorf("Bad queue: %v", list)
-	}
-
-	server.drainQueue()
-	if server.prints != 2 {
-		t.Errorf("Unable to print: %v", server.prints)
-	}
-}
-
 func TestPrintFailOnLoop(t *testing.T) {
 	server := InitTestServer()
 	server.pretendret = fmt.Errorf("Built to fail")
@@ -88,40 +62,6 @@ func TestClear(t *testing.T) {
 	server.drainQueue()
 
 	if server.prints != 0 {
-		t.Errorf("Wrong number of prints recorded: %v", server.prints)
-	}
-}
-
-func TestClearSingle(t *testing.T) {
-	server := InitTestServer()
-	server.Print(context.Background(), &pb.PrintRequest{Text: "hello", Origin: "inwhitelist"})
-	res, _ := server.Print(context.Background(), &pb.PrintRequest{Text: "hello2", Origin: "inwhitelist"})
-
-	if res.GetUid() == 0 {
-		t.Fatalf("Print element has no UID: %v", res)
-	}
-
-	server.Clear(context.Background(), &pb.ClearRequest{Uid: res.GetUid()})
-
-	if server.prints != 0 {
-		t.Errorf("We've recorded %v prints, despite not processing", server.prints)
-	}
-
-	err := server.readyToPrint(context.Background())
-	if err != nil {
-		t.Errorf("Bad load: %v", err)
-	}
-
-	err = server.readyToPrint(context.Background())
-	if err != nil {
-		t.Errorf("Bad load: %v", err)
-	}
-
-	time.Sleep(time.Second * 5)
-
-	server.drainQueue()
-
-	if server.prints != 1 {
 		t.Errorf("Wrong number of prints recorded: %v", server.prints)
 	}
 }

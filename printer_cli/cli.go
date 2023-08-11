@@ -28,6 +28,9 @@ func main() {
 	if os.Args[1] == "clear" {
 		_, err := client.Clear(ctx, &pbp.ClearRequest{})
 		fmt.Printf("CLEAR: %v\n", err)
+	} else if os.Args[1] == "ping" {
+		pong, err := client.Ping(ctx, &pbp.PingRequest{})
+		fmt.Printf("PING: %v %v\n", pong, err)
 	} else if os.Args[1] == "list" {
 		re, err := client.List(ctx, &pbp.ListRequest{})
 		if err != nil {
