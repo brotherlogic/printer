@@ -43,7 +43,7 @@ func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResp
 		urgency = pqpb.Urgency_URGENCY_IMMEDIATE
 	}
 	_, err = client.Print(ctx, &pqpb.PrintRequest{
-		Lines:       req.GetLines(),
+		Lines:       append(req.GetLines(), req.GetText()),
 		Urgency:     urgency,
 		Destination: pqpb.Destination_DESTINATION_RECEIPT,
 		Origin:      req.GetOrigin(),
