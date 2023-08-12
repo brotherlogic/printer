@@ -33,7 +33,7 @@ func (s *Server) Print(ctx context.Context, req *pb.PrintRequest) (*pb.PrintResp
 	s.RaiseIssue("Bad printer", fmt.Sprintf("%v is trying to use print directly - migrate them to printqueue", req.GetOrigin()))
 
 	// Reflect this over to the printqueue
-	conn, err := grpc.Dial("printqueue.brotherlogic-backend.com:80", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial("print.brotherlogic-backend.com:80", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
