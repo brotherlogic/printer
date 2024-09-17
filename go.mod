@@ -7,7 +7,7 @@ toolchain go1.23.0
 require (
 	github.com/brotherlogic/goserver v0.0.0-20240826215223-fccbac46b3d4
 	github.com/brotherlogic/printqueue v0.42.0
-	github.com/prometheus/client_golang v1.20.3
+	github.com/prometheus/client_golang v1.20.4
 	golang.org/x/net v0.29.0
 	google.golang.org/grpc v1.66.2
 	google.golang.org/protobuf v1.34.2
@@ -19,7 +19,7 @@ require (
 	github.com/brotherlogic/datastore v0.0.0-20240830190304-3b849e438317 // indirect
 	github.com/brotherlogic/discovery v0.0.0-20240914152846-5c4eeb33bef7 // indirect
 	github.com/brotherlogic/dstore v0.0.0-20240913202500-2ab49ac6843c // indirect
-	github.com/brotherlogic/githubcard v0.0.0-20240909200244-54b5c200c3a1 // indirect
+	github.com/brotherlogic/githubcard v0.0.0-20240916201536-50c552fbd34a // indirect
 	github.com/brotherlogic/githubridge v0.2802.0 // indirect
 	github.com/brotherlogic/gobuildslave v0.0.0-20240916033825-be73f9f949be // indirect
 	github.com/brotherlogic/keystore v0.0.0-20240508161349-814b3200b126 // indirect
